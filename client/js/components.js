@@ -18,6 +18,7 @@ const Components = {
       { id: 'records', label: 'Records & Certificates', icon: 'file-badge', href: 'records.html' },
       { id: 'vaccines', label: 'Vaccine Directory', icon: 'book-open', href: 'vaccine-directory.html' },
       { id: 'centers', label: 'Nearby Centers', icon: 'map-pin', href: 'centers.html' },
+      { id: 'reports', label: 'Reports', icon: 'bar-chart-3', href: 'reports.html' },
       { id: 'settings', label: 'Settings', icon: 'settings', href: 'settings.html' }
     ];
 

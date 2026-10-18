@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "public": false,
+  "cleanUrls": true,
+  "builds": [
+    {
+      "src": "client/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://vaxaguard-api.onrender.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ]
+}

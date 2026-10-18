@@ -9,6 +9,11 @@ const API_BASE = (function() {
   if (window.__VAXAGUARD_API_URL__) {
     return window.__VAXAGUARD_API_URL__;
   }
+  // If saved in localStorage (allows overriding backend URL for separate Vercel/Render hosting)
+  const savedUrl = localStorage.getItem('vaxaguard_api_url');
+  if (savedUrl && savedUrl.trim()) {
+    return savedUrl.trim().replace(/\/+$/, '');
+  }
   // If running on localhost or 127.0.0.1 on a frontend dev server (e.g. port 3000, 5500, 8080)
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     // If not port 5000, point to default backend port 5000

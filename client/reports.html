@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports & Analytics — VaxaGuard</title>
+  <meta name="description" content="Comprehensive immunization compliance reports, age-group breakdown, and audit exports.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Outfit']">
+            Reports & Coverage Analytics
+          </h1>
+          <p class="text-sm text-slate-500 mt-0.5">Comprehensive audit reports for families, pediatric cohorts, and institutions.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="window.print()"
+            class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 transition-all">
+            <i data-lucide="printer" class="w-4 h-4 text-sky-600"></i>
+            <span>Print Report</span>
+          </button>
+          <a href="records.html"
+            class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-xs shadow-md shadow-sky-600/20 hover:shadow-lg transition-all flex items-center gap-2">
+            <i data-lucide="file-badge" class="w-4 h-4"></i>
+            <span>Immunization Cards</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Top Summary Metrics Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="rep-total-members" class="text-2xl font-extrabold text-slate-900 font-['Outfit']">--</div>
+            <p class="text-xs text-slate-500 font-medium">Individuals Monitored</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="rep-completed-doses" class="text-2xl font-extrabold text-slate-900 font-['Outfit']">--</div>
+            <p class="text-xs text-slate-500 font-medium">Completed Doses</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="rep-due-doses" class="text-2xl font-extrabold text-slate-900 font-['Outfit']">--</div>
+            <p class="text-xs text-slate-500 font-medium">Due Soon & Upcoming</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div id="rep-overdue-doses" class="text-2xl font-extrabold text-slate-900 font-['Outfit']">--</div>
+            <p class="text-xs text-slate-500 font-medium">Overdue Doses</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cohort Compliance Breakdown Card -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 font-['Outfit']">Member Compliance Matrix</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Individual immunization protection status across age cohorts</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+            Verified Records
+          </span>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3.5 px-4">Member Name</th>
+                <th class="py-3.5 px-3">Cohort</th>
+                <th class="py-3.5 px-3">Age</th>
+                <th class="py-3.5 px-3">Completed / Total</th>
+                <th class="py-3.5 px-3">Compliance Rate</th>
+                <th class="py-3.5 px-4 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="reports-table-body" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-400">
+                  <span class="animate-spin inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full mr-2"></span>
+                  Calculating compliance statistics...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Age Group Guidance Note -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-2">
+          <div class="flex items-center gap-2 text-emerald-700 font-bold">
+            <i data-lucide="baby" class="w-4 h-4"></i> Pediatric Standard (UIP)
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            Covers critical zero-dose (BCG, OPV-0, HepB-0) through adolescent Td boosters. Recommended 100% on-time administration.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-2">
+          <div class="flex items-center gap-2 text-sky-700 font-bold">
+            <i data-lucide="user" class="w-4 h-4"></i> Adult Booster Routine
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            Emphasizes 10-year Tdap booster intervals, annual seasonal influenza immunization, and Hepatitis B occupational protection.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 space-y-2">
+          <div class="flex items-center gap-2 text-purple-700 font-bold">
+            <i data-lucide="heart-pulse" class="w-4 h-4"></i> Geriatric Shield (60+)
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            Prioritizes Pneumococcal conjugate/polysaccharide vaccination and 2-dose recombinant Shingles vaccine to prevent severe nerve pain.
+          </p>
+        </div>
+      </div>
+
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

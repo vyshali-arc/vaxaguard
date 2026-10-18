@@ -86,6 +86,28 @@
             <span class="text-slate-900 font-bold text-sm">Active (Daily)</span>
           </div>
         </div>
+
+        <div class="pt-4 border-t border-slate-100 space-y-2">
+          <label for="backend-url-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            Connected Backend API URL
+          </label>
+          <div class="flex items-center gap-3">
+            <input type="text" id="backend-url-input"
+              class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+              placeholder="e.g. https://vaxaguard.onrender.com/api or leave empty for default">
+            <button id="save-api-url-btn"
+              class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all">
+              Save URL
+            </button>
+            <button id="reset-api-url-btn"
+              class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all">
+              Reset
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400">
+            Current active: <span id="current-api-base" class="font-mono text-sky-700 font-semibold">/api</span>
+          </p>
+        </div>
       </div>
 
       <!-- Danger / Session Zone -->
@@ -125,6 +147,28 @@
       if (user.id || user._id) {
         document.getElementById('settings-user-id').textContent = user.id || user._id;
       }
+
+      // Display current active API Base
+      const currentBaseEl = document.getElementById('current-api-base');
+      const urlInput = document.getElementById('backend-url-input');
+      if (currentBaseEl) currentBaseEl.textContent = API.baseUrl;
+      const savedApiUrl = localStorage.getItem('vaxaguard_api_url');
+      if (urlInput && savedApiUrl) urlInput.value = savedApiUrl;
+
+      document.getElementById('save-api-url-btn')?.addEventListener('click', () => {
+        const val = urlInput.value.trim();
+        if (val) {
+          localStorage.setItem('vaxaguard_api_url', val);
+          Toast.success('Saved custom API URL. Reloading page...');
+          setTimeout(() => window.location.reload(), 600);
+        }
+      });
+
+      document.getElementById('reset-api-url-btn')?.addEventListener('click', () => {
+        localStorage.removeItem('vaxaguard_api_url');
+        Toast.info('Reset API URL to default. Reloading...');
+        setTimeout(() => window.location.reload(), 600);
+      });
 
       document.getElementById('logout-button-settings')?.addEventListener('click', () => {
         if (confirm('Log out of VaxaGuard?')) {
