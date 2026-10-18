@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Members — VaxaGuard</title>
+  <meta name="description" content="Manage vaccination profiles for children, adults, and seniors.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Outfit']">
+            Family Members
+          </h1>
+          <p class="text-sm text-slate-500 mt-1">Manage vaccination profiles for your loved ones.</p>
+        </div>
+
+        <button onclick="Components.openAddMemberModal(() => loadFamilyMembers())"
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 hover:shadow-lg transition-all active:scale-95 self-start sm:self-auto">
+          <i data-lucide="user-plus" class="w-4 h-4"></i>
+          <span>+ Add Family Member</span>
+        </button>
+      </div>
+
+      <!-- Filter Tabs & Search Bar (Matching Mockup Panel 4) -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <!-- Category Tabs -->
+        <div class="inline-flex p-1 rounded-2xl bg-white border border-slate-200/80 shadow-xs max-w-fit overflow-x-auto">
+          <button data-category="all" class="family-tab px-4 py-2 text-xs font-bold rounded-xl transition-all bg-sky-50 text-sky-700">
+            All (<span id="count-all">0</span>)
+          </button>
+          <button data-category="child" class="family-tab px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+            Children (<span id="count-child">0</span>)
+          </button>
+          <button data-category="adult" class="family-tab px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+            Adults (<span id="count-adult">0</span>)
+          </button>
+          <button data-category="senior" class="family-tab px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+            Seniors (<span id="count-senior">0</span>)
+          </button>
+          <a href="organizations.html" class="px-4 py-2 text-xs font-semibold text-amber-700 hover:text-amber-900 rounded-xl transition-all flex items-center gap-1">
+            Orphanage <i data-lucide="external-link" class="w-3 h-3"></i>
+          </a>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative w-full md:w-72">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="member-search-input"
+            class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+            placeholder="Search member name...">
+        </div>
+      </div>
+
+      <!-- Family Members Cards Grid -->
+      <div id="family-members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div class="col-span-full p-12 text-center text-slate-400 text-xs">
+          <span class="animate-spin inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full mr-2"></span>
+          Loading family members...
+        </div>
+      </div>
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/family.js"></script>
+</body>
+</html>

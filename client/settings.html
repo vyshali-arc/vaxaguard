@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings — VaxaGuard</title>
+  <meta name="description" content="Manage personal profile, role permissions, and system settings.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto space-y-6 sm:space-y-8">
+      
+      <!-- Page Header -->
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Outfit']">
+          Profile & System Settings
+        </h1>
+        <p class="text-sm text-slate-500 mt-0.5">Manage your credentials, role privileges, and data privacy.</p>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-100 space-y-6">
+        <div class="flex items-center gap-4 pb-6 border-b border-slate-100">
+          <div id="settings-avatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-sm">
+            V
+          </div>
+          <div>
+            <h2 id="settings-name" class="text-xl font-bold text-slate-900 font-['Outfit']">Vyshali Raman</h2>
+            <p id="settings-email" class="text-xs text-slate-500">vyshali@example.com</p>
+            <span id="settings-role" class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100 mt-1">
+              Parent or Guardian
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+            <span class="text-slate-400 font-medium">Account ID</span>
+            <p id="settings-user-id" class="font-mono text-slate-800 text-[11px] truncate">Loading...</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+            <span class="text-slate-400 font-medium">Jurisdiction</span>
+            <p class="font-bold text-slate-800">Universal Immunization Programme (India)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Diagnostic & Health Card -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-100 space-y-4">
+        <h3 class="text-base font-bold text-slate-900 font-['Outfit']">System Health & Deployment Status</h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-100">
+            <span class="text-emerald-700 font-semibold block">REST API Status</span>
+            <span class="text-slate-900 font-bold text-sm">200 OK • Online</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-100">
+            <span class="text-sky-700 font-semibold block">Mongoose ODM</span>
+            <span class="text-slate-900 font-bold text-sm">Connected</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-purple-50 border border-purple-100">
+            <span class="text-purple-700 font-semibold block">Cron Scheduler</span>
+            <span class="text-slate-900 font-bold text-sm">Active (Daily)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger / Session Zone -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-rose-100 space-y-4">
+        <h3 class="text-base font-bold text-rose-900 font-['Outfit']">Session & Security</h3>
+        <p class="text-xs text-slate-600">Signing out will clear local tokens and end your session across this device.</p>
+        <div>
+          <button id="logout-button-settings"
+            class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Log Out of VaxaGuard</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Components.initCommon('settings');
+
+      const user = API.getUser() || {};
+      if (user.name) {
+        document.getElementById('settings-name').textContent = user.name;
+        document.getElementById('settings-avatar').textContent = user.name.charAt(0).toUpperCase();
+      }
+      if (user.email) {
+        document.getElementById('settings-email').textContent = user.email;
+      }
+      if (user.role) {
+        document.getElementById('settings-role').textContent = user.role.replace('_', ' ');
+      }
+      if (user.id || user._id) {
+        document.getElementById('settings-user-id').textContent = user.id || user._id;
+      }
+
+      document.getElementById('logout-button-settings')?.addEventListener('click', () => {
+        if (confirm('Log out of VaxaGuard?')) {
+          API.clearSession();
+          window.location.href = 'login.html';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

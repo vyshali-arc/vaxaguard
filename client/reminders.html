@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reminders & Notifications — VaxaGuard</title>
+  <meta name="description" content="Configure automated vaccination reminders and review real-time alerts.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8">
+      
+      <!-- Page Header -->
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Outfit']">
+          Reminders & Notifications
+        </h1>
+        <p class="text-sm text-slate-500 mt-0.5">Never miss a vaccination. Manage automated channels and alerts.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+        
+        <!-- Left Column: Notification Settings (Matching Mockup Panel 9) - 6 Cols -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 space-y-6">
+            <div class="pb-4 border-b border-slate-100">
+              <h2 class="text-lg font-bold text-slate-900 font-['Outfit']">Notification Channels</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Choose how you wish to receive scheduled alerts</p>
+            </div>
+
+            <form id="reminder-settings-form" class="space-y-5">
+              <!-- Email Toggle -->
+              <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-900">Email Reminders</h4>
+                    <p class="text-xs text-slate-500">Receive email notifications for upcoming vaccinations</p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="pref-email-toggle" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                </label>
+              </div>
+
+              <!-- SMS Toggle -->
+              <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-900">SMS Reminders</h4>
+                    <p class="text-xs text-slate-500">Receive SMS notifications (if mobile gateway configured)</p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="pref-sms-toggle" class="sr-only peer">
+                  <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                </label>
+              </div>
+
+              <!-- Reminder Timing Dropdown -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="pref-timing-select">
+                  Reminder Timing
+                </label>
+                <select id="pref-timing-select"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+                  <option value="1">1 day before due date</option>
+                  <option value="3">3 days before due date</option>
+                  <option value="7" selected>7 days before due date (Recommended)</option>
+                  <option value="14">14 days before due date</option>
+                </select>
+              </div>
+
+              <!-- Additional Notes -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="pref-notes-input">
+                  Additional Notes
+                </label>
+                <textarea id="pref-notes-input" rows="3"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  placeholder="Add any notes for reminders or preferred clinic operating hours..."></textarea>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" id="save-pref-btn"
+                  class="w-full py-3 px-4 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-md shadow-sky-600/20 hover:shadow-lg transition-all text-xs">
+                  Save Preferences
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column: Real In-App Notification Center - 6 Cols -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <h2 class="text-lg font-bold text-slate-900 font-['Outfit']">Recent Alerts</h2>
+                <span id="unread-count-pill" class="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 hidden">0 Unread</span>
+              </div>
+              <button id="mark-all-read-btn" class="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors">
+                Mark all as read
+              </button>
+            </div>
+
+            <!-- Notifications List -->
+            <div id="notifications-list-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+              <div class="p-8 text-center text-slate-400 text-xs">
+                <span class="animate-spin inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full mr-2"></span>
+                Loading alerts...
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/reminders.js"></script>
+</body>
+</html>

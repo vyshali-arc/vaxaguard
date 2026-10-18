@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaxaGuard — Smart Vaccination & Immunization Tracker</title>
+  <meta name="description" content="A secure and simple platform to manage vaccination schedules for children, adults, seniors, and individuals in institutional care like orphanages.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#F0F9FF',
+              100: '#E0F2FE',
+              200: '#BAE6FD',
+              300: '#7DD3FC',
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+              700: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+            },
+            navy: {
+              800: '#1E293B',
+              900: '#0F172A',
+            },
+            teal: {
+              500: '#14B8A6',
+              600: '#0D9488',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased selection:bg-sky-100 selection:text-sky-800">
+
+  <!-- Top Header / Navigation -->
+  <nav class="sticky top-0 z-50 glass-nav transition-all duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Brand Logo -->
+        <a href="index.html" class="flex items-center gap-3 group">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <span class="text-2xl font-bold text-slate-900 tracking-tight font-['Outfit']">Vaxa<span class="text-sky-600">Guard</span></span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#hero" class="text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors">Home</a>
+          <a href="#features" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Features</a>
+          <a href="#all-ages" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">For All Ages</a>
+          <a href="#organizations" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">For Organizations</a>
+          <a href="#how-it-works" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">How It Works</a>
+          <a href="#about" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">About</a>
+        </div>
+
+        <!-- Auth CTAs -->
+        <div class="hidden md:flex items-center gap-3">
+          <a href="login.html" class="px-5 py-2.5 text-sm font-semibold text-slate-700 hover:text-sky-600 rounded-xl hover:bg-slate-100/80 transition-all">
+            Login
+          </a>
+          <a href="register.html" class="px-6 py-2.5 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-md shadow-sky-600/20 hover:shadow-lg hover:shadow-sky-600/30 transition-all active:scale-95">
+            Sign Up
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 bg-white/95 px-4 pt-2 pb-6 space-y-3">
+      <a href="#hero" class="block px-3 py-2 text-base font-semibold text-sky-600 rounded-lg">Home</a>
+      <a href="#features" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 rounded-lg">Features</a>
+      <a href="#all-ages" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 rounded-lg">For All Ages</a>
+      <a href="#organizations" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 rounded-lg">For Organizations</a>
+      <a href="#how-it-works" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 rounded-lg">How It Works</a>
+      <a href="#about" class="block px-3 py-2 text-base font-medium text-slate-600 hover:bg-slate-50 rounded-lg">About</a>
+      <div class="pt-4 flex flex-col gap-2">
+        <a href="login.html" class="w-full text-center py-2.5 font-semibold text-slate-700 border border-slate-200 rounded-xl">Login</a>
+        <a href="register.html" class="w-full text-center py-2.5 font-semibold text-white bg-sky-600 rounded-xl shadow-md shadow-sky-600/20">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="relative pt-8 pb-16 lg:pt-14 lg:pb-24 overflow-hidden">
+    <!-- Subtle Background Glows -->
+    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-sky-200/50 via-teal-100/40 to-indigo-100/40 blur-3xl -z-10 rounded-full pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Hero Text & Left Column -->
+        <div class="lg:col-span-7 space-y-6">
+          <!-- Tagline Pill -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200/80 text-sky-700 text-xs sm:text-sm font-semibold tracking-wide shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+            Smart Vaccination & Immunization Tracker
+          </div>
+
+          <!-- Main Heading -->
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+            Track. Protect. <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-sky-500 to-teal-500">
+              Stay Healthy —
+            </span><br>
+            For Everyone.
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-2xl font-normal">
+            A secure and simple platform to manage vaccination schedules for children, adults, seniors, and individuals in institutional care like orphanages.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a href="register.html" class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-base font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-lg shadow-sky-600/25 hover:shadow-xl hover:shadow-sky-600/35 transition-all group active:scale-95">
+              <span>Get Started</span>
+              <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            <a href="#features" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-base font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-xs hover:border-slate-300 transition-all">
+              <span>Learn More</span>
+            </a>
+          </div>
+
+          <!-- Feature Bullets (as in Mockup) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-4 text-sm text-slate-700">
+            <div class="flex items-center gap-2.5">
+              <div class="w-5 h-5 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+              </div>
+              <span class="font-medium">Personalized schedules</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-5 h-5 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+              </div>
+              <span class="font-medium">Timely reminders</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-5 h-5 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+              </div>
+              <span class="font-medium">Digital records & certificates</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-5 h-5 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>
+              </div>
+              <span class="font-medium">Support for families, NGOs & healthcare</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Illustration & Right Column -->
+        <div class="lg:col-span-5 relative">
+          <div class="relative mx-auto max-w-md lg:max-w-none">
+            <!-- Decorative Backing Card -->
+            <div class="absolute -inset-2 bg-gradient-to-tr from-sky-400/20 to-teal-400/20 rounded-3xl blur-xl"></div>
+            
+            <div class="relative bg-white rounded-3xl p-6 sm:p-8 card-shadow border border-slate-100/80">
+              <!-- Illustrated Healthcare & Family Group Vector -->
+              <div class="relative w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-sky-50 via-indigo-50/50 to-teal-50 flex items-center justify-center overflow-hidden border border-sky-100">
+                <!-- Large Shield Watermark -->
+                <div class="absolute right-4 top-4 text-sky-200/50 pointer-events-none">
+                  <svg class="w-32 h-32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                </div>
+
+                <!-- Stylized Healthcare & Multi-Generational Family Characters -->
+                <svg class="w-full h-full max-w-[380px] p-2" viewBox="0 0 500 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Doctor (Center Right) -->
+                  <circle cx="340" cy="110" r="32" fill="#FBCFE8"/> <!-- Doctor Face -->
+                  <path d="M310 95 C310 70, 370 70, 370 95 Z" fill="#1E293B"/> <!-- Hair -->
+                  <rect x="305" y="145" width="70" height="150" rx="20" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="4"/> <!-- White Coat -->
+                  <path d="M325 155 L325 180 L355 180 L355 155" stroke="#0284C7" stroke-width="4" stroke-linecap="round"/> <!-- Stethoscope -->
+                  <circle cx="340" cy="190" r="6" fill="#0284C7"/> <!-- Stethoscope Bell -->
+                  <!-- Doctor Badge -->
+                  <rect x="315" y="165" width="16" height="8" rx="2" fill="#0284C7"/>
+
+                  <!-- Nurse / Healthcare Professional (Far Right) -->
+                  <circle cx="415" cy="125" r="28" fill="#FED7AA"/>
+                  <path d="M390 115 C390 90, 440 90, 440 115 Z" fill="#475569"/>
+                  <rect x="385" y="155" width="60" height="135" rx="16" fill="#0D9488"/> <!-- Teal Scrubs -->
+                  <!-- Medical cross on nurse chest -->
+                  <path d="M415 175 v12 M409 181 h12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+
+                  <!-- Grandparent / Senior (Left) -->
+                  <circle cx="105" cy="130" r="28" fill="#FDE68A"/>
+                  <path d="M80 125 C80 100, 130 100, 130 125 Z" fill="#94A3B8"/> <!-- Grey Hair -->
+                  <!-- Glasses -->
+                  <circle cx="98" cy="128" r="7" stroke="#475569" stroke-width="2"/>
+                  <circle cx="114" cy="128" r="7" stroke="#475569" stroke-width="2"/>
+                  <path d="M105 128 h2" stroke="#475569" stroke-width="2"/>
+                  <rect x="75" y="160" width="60" height="130" rx="16" fill="#6366F1"/> <!-- Lavender/Purple shirt -->
+
+                  <!-- Mother / Adult (Center Left) -->
+                  <circle cx="180" cy="120" r="28" fill="#FBCFE8"/>
+                  <path d="M155 110 C155 80, 205 80, 205 110 C205 130, 200 140, 205 150" fill="#334155"/> <!-- Hair -->
+                  <rect x="150" y="150" width="60" height="140" rx="16" fill="#EC4899"/> <!-- Pink/Magenta top -->
+
+                  <!-- Child (Boy standing with vaccination band-aid) -->
+                  <circle cx="245" cy="165" r="24" fill="#FED7AA"/>
+                  <path d="M225 155 C225 140, 265 140, 265 155 Z" fill="#1E293B"/> <!-- Short hair -->
+                  <rect x="225" y="190" width="40" height="100" rx="12" fill="#F59E0B"/> <!-- Yellow shirt -->
+                  <!-- Band-aid on arm -->
+                  <rect x="262" y="210" width="10" height="6" rx="2" fill="#E2E8F0" stroke="#CBD5E1"/>
+                  <circle cx="267" cy="213" r="1.5" fill="#EF4444"/>
+
+                  <!-- Child in Wheelchair (Inclusive representation as in mockup) -->
+                  <circle cx="280" cy="235" r="20" fill="#FDE68A"/>
+                  <path d="M265 225 C265 210, 295 210, 295 225 Z" fill="#64748B"/>
+                  <rect x="265" y="255" width="30" height="40" rx="8" fill="#3B82F6"/>
+                  <!-- Wheelchair wheel -->
+                  <circle cx="280" cy="295" r="24" stroke="#0284C7" stroke-width="5" fill="none"/>
+                  <circle cx="280" cy="295" r="6" fill="#0284C7"/>
+                  <path d="M280 271 L280 319 M256 295 L304 295" stroke="#0284C7" stroke-width="2"/>
+                </svg>
+
+                <!-- Floating Live Badge -->
+                <div class="absolute bottom-3 left-4 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200/80 shadow-md flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></div>
+                  <span class="text-xs font-semibold text-slate-800">100% UIP & IAP Compliant</span>
+                </div>
+              </div>
+
+              <!-- Quick Stats Bar inside Card -->
+              <div class="grid grid-cols-3 gap-2 pt-4 text-center border-t border-slate-100 mt-4">
+                <div>
+                  <div class="text-lg font-bold text-sky-600 font-['Outfit']">100%</div>
+                  <div class="text-[11px] text-slate-500 font-medium">Free Tier Ready</div>
+                </div>
+                <div class="border-x border-slate-100">
+                  <div class="text-lg font-bold text-emerald-600 font-['Outfit']">All Ages</div>
+                  <div class="text-[11px] text-slate-500 font-medium">Child to Senior</div>
+                </div>
+                <div>
+                  <div class="text-lg font-bold text-amber-600 font-['Outfit']">NGO / Care</div>
+                  <div class="text-[11px] text-slate-500 font-medium">Inclusive Module</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Target Group Cards (Directly Matching Panel 1 of Mockup) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-12">
+        <!-- Card 1: Children -->
+        <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-100 card-hover flex items-center gap-4">
+          <div class="w-13 h-13 w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
+            <i data-lucide="baby" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-slate-900 text-base">Children</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100/70 text-emerald-700">0–17 yrs</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Growth with protection & routine UIP shots</p>
+          </div>
+        </div>
+
+        <!-- Card 2: Adults -->
+        <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-100 card-hover flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0 border border-sky-100">
+            <i data-lucide="user" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-slate-900 text-base">Adults</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100/70 text-sky-700">18–59 yrs</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Travel, boosters, tetanus & occupational vaccines</p>
+          </div>
+        </div>
+
+        <!-- Card 3: Seniors -->
+        <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-100 card-hover flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0 border border-purple-100">
+            <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-slate-900 text-base">Seniors</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-100/70 text-purple-700">60+ yrs</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Stay active with flu, shingles & pneumococcal shots</p>
+          </div>
+        </div>
+
+        <!-- Card 4: Orphanages & NGOs -->
+        <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-100 card-hover flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-100">
+            <i data-lucide="building-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-slate-900 text-base">Orphanages / NGOs</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100/70 text-amber-800">Care</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Children without family care, aggregate reporting</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Features Section -->
+  <section id="features" class="py-20 bg-white border-y border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <h2 class="text-xs uppercase tracking-widest font-bold text-sky-600">Built For Reliability & Care</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Everything You Need for Lifelong Immunization</p>
+        <p class="text-base text-slate-600">Engineered with role-based access, strict medical guideline adherence, and privacy-first records.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pt-16">
+        <!-- Feature 1 -->
+        <div class="p-6 rounded-2xl bg-slate-50/80 border border-slate-100 card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-md shadow-sky-600/20">
+            <i data-lucide="calendar" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Personalized Schedules</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Auto-calculated due dates dynamically calibrated to date of birth using Indian UIP and international immunization guidelines.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="p-6 rounded-2xl bg-slate-50/80 border border-slate-100 card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20">
+            <i data-lucide="bell-ring" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Smart Reminders</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Automated in-app and email notifications before due dates. Never miss booster shots, polio drops, or seasonal flu jabs.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="p-6 rounded-2xl bg-slate-50/80 border border-slate-100 card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20">
+            <i data-lucide="file-check" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Digital Records & Vault</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Store batch numbers, clinics, doctor notes, and certificate scans. Generate verified downloadable PDF immunization cards anytime.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="p-6 rounded-2xl bg-slate-50/80 border border-slate-100 card-hover space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-600/20">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Community Care</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Dedicated multi-child tracking for orphanages and NGOs with audit logs, responsibility transfer, and aggregate reports.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For All Ages Breakdown -->
+  <section id="all-ages" class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
+        <h2 class="text-xs uppercase tracking-widest font-bold text-sky-600">Complete Coverage</h2>
+        <p class="text-3xl font-extrabold text-slate-900">Vaccine Schedules For Every Life Stage</p>
+        <p class="text-sm text-slate-600">Vaccination does not stop in childhood. VaxaGuard manages lifetime immunity.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Stage 1: Childhood -->
+        <div class="bg-white rounded-2xl p-7 card-shadow border border-slate-100 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Pediatric Care</span>
+              <span class="text-slate-400 text-xs">Birth to 16 yrs</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Children & Infants</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Protection against early childhood diseases during critical developmental stages:
+            </p>
+            <ul class="space-y-2.5 text-xs text-slate-700">
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> BCG (Tuberculosis) at birth</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Hepatitis B, OPV, Rotavirus</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> DPT / Pentavalent (6, 10, 14 weeks)</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Measles & Rubella (MR / MMR)</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Typhoid Conjugate & Vitamin A</li>
+            </ul>
+          </div>
+          <div class="pt-6 border-t border-slate-100 mt-6">
+            <a href="register.html" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+              Start Child Profile <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Stage 2: Adults -->
+        <div class="bg-white rounded-2xl p-7 card-shadow border border-slate-100 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-sky-100 text-sky-800">Active Life</span>
+              <span class="text-slate-400 text-xs">18 to 59 yrs</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Adults & Travelers</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Maintain immunity throughout career, family planning, and international travel:
+            </p>
+            <ul class="space-y-2.5 text-xs text-slate-700">
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i> Td / Tdap booster every 10 years</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i> Annual Influenza (Flu) protection</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i> Hepatitis A & B catch-up doses</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i> HPV for young adults & prevention</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i> Yellow Fever / Meningococcal for travel</li>
+            </ul>
+          </div>
+          <div class="pt-6 border-t border-slate-100 mt-6">
+            <a href="register.html" class="text-sm font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">
+              Start Adult Profile <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Stage 3: Seniors -->
+        <div class="bg-white rounded-2xl p-7 card-shadow border border-slate-100 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-100 text-purple-800">Healthy Aging</span>
+              <span class="text-slate-400 text-xs">60+ yrs</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Senior Citizens</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Defend against complications from common respiratory and nerve infections:
+            </p>
+            <ul class="space-y-2.5 text-xs text-slate-700">
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i> High-dose Seasonal Influenza</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i> Pneumococcal (PCV20 / PPSV23)</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i> Shingles (Herpes Zoster) vaccine</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i> Td / Tetanus routine defense</li>
+              <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i> Caregiver oversight & proxy tracking</li>
+            </ul>
+          </div>
+          <div class="pt-6 border-t border-slate-100 mt-6">
+            <a href="register.html" class="text-sm font-semibold text-purple-600 hover:text-purple-700 flex items-center gap-1">
+              Start Senior Profile <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Orphanage & NGO Section -->
+  <section id="organizations" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-slate-900 to-sky-950 rounded-3xl p-8 sm:p-12 lg:p-16 text-white relative overflow-hidden">
+        <!-- Background Accents -->
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-semibold">
+              <i data-lucide="heart" class="w-3.5 h-3.5"></i> Special Community Module
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              Empowering Child-Care Institutions & Orphanages
+            </h2>
+            <p class="text-slate-300 text-base leading-relaxed">
+              Every child deserves protection. Institutional coordinators can register child-care shelters, manage immunization schedules for dozens of children, avoid missed booster deadlines, and securely hand over records upon adoption or transfer.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-white">Strict Privacy</h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Zero public exposure of child identity. Strict audit logs.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-white">Aggregate Reports</h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Instant institution-wide vaccination coverage statistics.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-white">Care Handover</h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Seamless transition of medical history to adoptive parents.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i data-lucide="file-text" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-white">Health Drive PDF</h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Printable batch schedules for on-site medical checkups.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4">
+              <a href="register.html?role=ngo" class="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg shadow-amber-500/20">
+                <span>Register Organization</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Preview Mockup Card -->
+          <div class="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center">
+                  <i data-lucide="home" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-white">Hope Home Orphanage</h4>
+                  <p class="text-[11px] text-slate-300">Registered Children: 12</p>
+                </div>
+              </div>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">92% Covered</span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-white">Riya (2 yrs)</span>
+                  <span class="text-slate-300 block text-[11px]">DPT - Dose 2 • 25 Oct 2026</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-semibold text-[10px]">Due Soon</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-white">Karthik (3 yrs)</span>
+                  <span class="text-slate-300 block text-[11px]">MMR Booster • 10 Nov 2026</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-sky-400/20 text-sky-300 font-semibold text-[10px]">Upcoming</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-20 bg-slate-50 border-t border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto space-y-3 mb-16">
+        <h2 class="text-xs uppercase tracking-widest font-bold text-sky-600">Simplicity By Design</h2>
+        <p class="text-3xl font-extrabold text-slate-900">How VaxaGuard Works in 4 Steps</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xl shadow-sm">1</div>
+          <h4 class="font-bold text-base text-slate-900">Register & Add Members</h4>
+          <p class="text-xs text-slate-600">Create profiles for yourself, children, elderly parents, or institutional wards.</p>
+        </div>
+
+        <div class="text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center font-bold text-xl shadow-sm">2</div>
+          <h4 class="font-bold text-base text-slate-900">Auto-Generate Schedule</h4>
+          <p class="text-xs text-slate-600">Our engine calculates personalized due dates using verified National Guidelines.</p>
+        </div>
+
+        <div class="text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xl shadow-sm">3</div>
+          <h4 class="font-bold text-base text-slate-900">Get Smart Reminders</h4>
+          <p class="text-xs text-slate-600">Receive alerts before due dates. Never miss a dose, booster, or catch-up interval.</p>
+        </div>
+
+        <div class="text-center space-y-3">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl shadow-sm">4</div>
+          <h4 class="font-bold text-base text-slate-900">Record & Download PDF</h4>
+          <p class="text-xs text-slate-600">Upload clinic certificates and export official vaccination history cards instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About & Project Mission -->
+  <section id="about" class="py-16 bg-white border-t border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900">About VaxaGuard</h2>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          VaxaGuard is a modern, privacy-first, community-oriented full-stack vaccination and immunization management system built as an individual BTech engineering project. Developed using Node.js, Express, MongoDB Atlas, and modern frontend technologies, it bridges the gap between individual family records and institutional community healthcare.
+        </p>
+        <div class="pt-2 flex justify-center gap-4">
+          <a href="login.html" class="px-5 py-2 text-xs font-semibold text-sky-600 bg-sky-50 border border-sky-200 rounded-lg">Try Live Demo</a>
+          <a href="#hero" class="px-5 py-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-lg">Back to Top</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-sky-600 flex items-center justify-center text-white">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-white font-['Outfit']">Vaxa<span class="text-sky-400">Guard</span></span>
+        </div>
+        <p class="text-slate-400 text-center md:text-right">
+          Track. Protect. Stay Healthy — For Everyone.
+        </p>
+      </div>
+
+      <!-- Medical Disclaimer Notice -->
+      <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-300 leading-relaxed text-[11px]">
+        <strong class="text-white">Medical Disclaimer:</strong> The immunization schedules and guidelines presented in VaxaGuard are based on public healthcare recommendations including the Indian National Immunization Schedule (Universal Immunization Programme) and verified pediatric guidance. VaxaGuard is an informational tracking tool and does not replace professional medical diagnosis, clinical evaluation, or doctor prescriptions. Always consult a certified medical practitioner or pediatrician before administering any vaccine.
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800 text-slate-500">
+        <p>© 2026 VaxaGuard Project. All rights reserved. BTech Mini Project Submission.</p>
+        <div class="flex gap-6">
+          <a href="login.html" class="hover:text-slate-300">Sign In</a>
+          <a href="register.html" class="hover:text-slate-300">Register</a>
+          <a href="dashboard.html" class="hover:text-slate-300">App Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+  </script>
+</body>
+</html>

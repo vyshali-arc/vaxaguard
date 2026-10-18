@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orphanage & NGO Management — VaxaGuard</title>
+  <meta name="description" content="Immunization management and health oversight for children in institutional care.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-bold mb-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i> Authorized Community Module
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Outfit']">
+            Orphanage / NGO Management
+          </h1>
+          <p class="text-sm text-slate-500 mt-0.5">Manage children and beneficiaries under institutional care.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="download-org-report-btn"
+            class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 transition-all">
+            <i data-lucide="file-bar-chart" class="w-4 h-4 text-amber-600"></i>
+            <span>Aggregate Report</span>
+          </button>
+          <button id="add-child-btn"
+            class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>+ Add Child</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Organization Summary Card (Matching Mockup Panel 5) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-white flex items-center justify-center font-bold text-2xl shadow-md shadow-amber-500/20 flex-shrink-0">
+            <i data-lucide="home" class="w-8 h-8"></i>
+          </div>
+          <div class="space-y-1">
+            <h2 id="org-name-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 font-['Outfit']">
+              Hope Home Orphanage
+            </h2>
+            <p id="org-meta-subtitle" class="text-xs text-slate-500">
+              Registered Children: <span id="org-registered-count" class="font-bold text-slate-800">12</span> • Type: Child Care Institution
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="text-right hidden sm:block">
+            <span class="text-xs text-slate-400 block font-medium">Cohort Coverage</span>
+            <span id="org-coverage-pct" class="text-xl font-extrabold text-emerald-600 font-['Outfit']">92%</span>
+          </div>
+          <button id="view-org-details-btn"
+            class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all">
+            View Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs & Table (Matching Mockup Panel 5) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <!-- Filter Tabs -->
+          <div class="inline-flex p-1 rounded-2xl bg-slate-100 max-w-fit overflow-x-auto text-xs">
+            <button data-status="all" class="ngo-tab px-4 py-2 font-bold rounded-xl transition-all bg-white text-slate-900 shadow-xs">
+              All Children (<span id="ngo-count-all">0</span>)
+            </button>
+            <button data-status="upcoming" class="ngo-tab px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+              Upcoming (<span id="ngo-count-upcoming">0</span>)
+            </button>
+            <button data-status="overdue" class="ngo-tab px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+              Overdue (<span id="ngo-count-overdue">0</span>)
+            </button>
+            <button data-status="completed" class="ngo-tab px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition-all">
+              Completed (<span id="ngo-count-completed">0</span>)
+            </button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative w-full sm:w-64">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="beneficiary-search"
+              class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              placeholder="Search child name...">
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3.5 px-4">Name</th>
+                <th class="py-3.5 px-3">Age</th>
+                <th class="py-3.5 px-3">Next Vaccine</th>
+                <th class="py-3.5 px-3">Due Date</th>
+                <th class="py-3.5 px-3">Status</th>
+                <th class="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="beneficiaries-table-body" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-400">
+                  <span class="animate-spin inline-block w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full mr-2"></span>
+                  Loading children records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <!-- Add Beneficiary Modal -->
+  <div id="add-beneficiary-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-3xl card-shadow border border-slate-100 max-w-md w-full p-6 sm:p-8 modal-content relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <h3 class="text-xl font-bold text-slate-900 font-['Outfit']">Add Child to Care</h3>
+        <button class="p-1 rounded-lg text-slate-400 hover:text-slate-600" onclick="document.getElementById('add-beneficiary-modal').classList.add('hidden')">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="add-beneficiary-form" class="space-y-4 pt-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="ben-name">
+            Child Name / Initial *
+          </label>
+          <input type="text" id="ben-name" required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+            placeholder="e.g. Riya">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="ben-dob">
+              Date of Birth *
+            </label>
+            <input type="date" id="ben-dob" required
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="ben-gender">
+              Gender
+            </label>
+            <select id="ben-gender"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500">
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="ben-code">
+            Beneficiary Case Code (Optional)
+          </label>
+          <input type="text" id="ben-code"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+            placeholder="e.g. HH-2026-042">
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" class="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+            onclick="document.getElementById('add-beneficiary-modal').classList.add('hidden')">
+            Cancel
+          </button>
+          <button type="submit" id="save-beneficiary-btn"
+            class="px-6 py-2.5 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-sm transition-all">
+            Admit & Generate Schedule
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Handover Care Modal -->
+  <div id="handover-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-3xl card-shadow border border-slate-100 max-w-md w-full p-6 sm:p-8 modal-content relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-xl font-bold text-slate-900 font-['Outfit']">Handover Care Responsibility</h3>
+          <p class="text-xs text-slate-500" id="handover-child-name">Transfer medical records for adoption or institutional move</p>
+        </div>
+        <button class="p-1 rounded-lg text-slate-400 hover:text-slate-600" onclick="document.getElementById('handover-modal').classList.add('hidden')">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="handover-form" class="space-y-4 pt-4">
+        <input type="hidden" id="handover-child-id">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="handover-reason">
+            Handover Reason *
+          </label>
+          <select id="handover-reason" required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+            <option value="Legal Adoption">Legal Adoption</option>
+            <option value="Transfer to Partner Care Facility">Transfer to Partner Care Facility</option>
+            <option value="Reunited with Biological Family">Reunited with Biological Family</option>
+            <option value="Attained Adulthood (Independent Living)">Attained Adulthood (Independent Living)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="handover-guardian">
+            Receiving Guardian / Institution Name *
+          </label>
+          <input type="text" id="handover-guardian" required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+            placeholder="e.g. Mr. & Mrs. Sharma (Adoptive Parents)">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="handover-notes">
+            Audit Notes
+          </label>
+          <textarea id="handover-notes" rows="2"
+            class="w-full px-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+            placeholder="Court order number, transfer certificate ref..."></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" class="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+            onclick="document.getElementById('handover-modal').classList.add('hidden')">
+            Cancel
+          </button>
+          <button type="submit" id="confirm-handover-btn"
+            class="px-6 py-2.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-sm transition-all">
+            Confirm Handover & Log Audit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/organizations.js"></script>
+</body>
+</html>

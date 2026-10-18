@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vaccination Schedule — VaxaGuard</title>
+  <meta name="description" content="Individual immunization timeline, dose tracker, and status view.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#F0F9FF', 100: '#E0F2FE', 600: '#0284C7', 700: '#0369A1' },
+            navy: { 800: '#1E293B', 900: '#0F172A' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 antialiased min-h-screen">
+
+  <div id="toast-container"></div>
+  <div id="sidebar-container"></div>
+
+  <div class="lg:pl-[260px] flex flex-col min-h-screen pb-16 lg:pb-0">
+    <div id="topbar-container"></div>
+
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- Back Link & Member Selector -->
+      <div class="flex items-center justify-between">
+        <a href="family.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-sky-600 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Back to Family Members</span>
+        </a>
+
+        <!-- Switch Person Dropdown -->
+        <div class="flex items-center gap-2">
+          <label for="switch-person-select" class="text-xs text-slate-500 font-medium hidden sm:inline">Switch Person:</label>
+          <select id="switch-person-select"
+            class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20">
+            <option value="">Loading members...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Member Header Banner (Matching Mockup Panel 6) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div id="member-avatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-500 text-white flex items-center justify-center font-bold text-2xl shadow-md shadow-sky-500/20 flex-shrink-0">
+            A
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2.5">
+              <h1 id="member-name-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 font-['Outfit']">
+                Aarav
+              </h1>
+              <span id="member-category-badge" class="badge-child text-xs font-bold px-2.5 py-0.5 rounded-full">
+                Child (0–17)
+              </span>
+            </div>
+            <p id="member-meta-details" class="text-xs text-slate-500">
+              Male • 3 years • DOB: 15 Jan 2023
+            </p>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button id="download-pdf-btn"
+            class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 transition-all">
+            <i data-lucide="download" class="w-4 h-4 text-sky-600"></i>
+            <span>Download PDF Card</span>
+          </button>
+          <button id="add-dose-btn"
+            class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md shadow-sky-600/20 hover:shadow-lg transition-all flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Log Vaccine Dose</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Sub-Tabs (Matching Mockup Panel 6) -->
+      <div class="border-b border-slate-200/80 flex items-center gap-8 text-sm font-semibold overflow-x-auto">
+        <button class="pb-3 text-slate-400 hover:text-slate-600 transition-colors">Overview</button>
+        <button class="pb-3 text-sky-600 border-b-2 border-sky-600 font-bold">Vaccination Schedule</button>
+        <a href="records.html" class="pb-3 text-slate-400 hover:text-slate-600 transition-colors">Records</a>
+        <button onclick="alert('Growth & Pediatric Vitals feature is part of Final-Year milestone.');" class="pb-3 text-slate-400 hover:text-slate-600 transition-colors">Growth & Health</button>
+        <button onclick="alert('Documents Vault view is available in Records & Certificates tab.');" class="pb-3 text-slate-400 hover:text-slate-600 transition-colors">Documents</button>
+      </div>
+
+      <!-- Schedule Table Card (Matching Mockup Panel 6) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-7 card-shadow border border-slate-100 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 font-['Outfit']">Vaccination Schedule</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Based on WHO / Indian National Immunization Schedule (customizable)</p>
+          </div>
+
+          <!-- Status Filter Dropdown -->
+          <div class="flex items-center gap-2">
+            <label for="filter-status-select" class="text-xs text-slate-500 font-medium">Filter:</label>
+            <select id="filter-status-select"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/20">
+              <option value="all">All Vaccines</option>
+              <option value="completed">Completed</option>
+              <option value="due_soon">Due Soon</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th class="py-3.5 px-4">Vaccine</th>
+                <th class="py-3.5 px-3">Dose</th>
+                <th class="py-3.5 px-3">Recommended Age</th>
+                <th class="py-3.5 px-3">Due Date</th>
+                <th class="py-3.5 px-3">Status</th>
+                <th class="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-table-body" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-400">
+                  <span class="animate-spin inline-block w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full mr-2"></span>
+                  Loading schedule entries...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <div id="mobile-nav-container"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/schedule.js"></script>
+</body>
+</html>
