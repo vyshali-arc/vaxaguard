@@ -198,6 +198,43 @@ describe('VaxaGuard Core API & Security Test Suite', () => {
     expect(schedule.linkedRecordId).toBeDefined();
   });
 
+    // Additional tests for missing/invalid vaccineDefinitionId
+    test('POST /api/records - Missing vaccineDefinitionId should fail', async () => {
+      const bcgDef = await VaccineDefinition.findOne({ code: 'BCG' });
+      const res = await request(app)
+        .post('/api/records')
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send({
+          dependentId: dependent1Id,
+          // vaccineDefinitionId omitted intentionally
+          vaccineName: 'BCG',
+          doseNumber: 1,
+          administeredAt: '2025-01-02',
+          clinic: 'Rainbow Children Hospital'
+        });
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/Vaccine definition ID is required/);
+    });
+
+    test('POST /api/records - Invalid vaccineDefinitionId should fail', async () => {
+      const invalidId = new mongoose.Types.ObjectId();
+      const res = await request(app)
+        .post('/api/records')
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send({
+          dependentId: dependent1Id,
+          vaccineDefinitionId: invalidId,
+          vaccineName: 'Nonexistent Vaccine',
+          doseNumber: 1,
+          administeredAt: '2025-01-02',
+          clinic: 'Rainbow Children Hospital'
+        });
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/Vaccine definition ID is required/);
+    });
+
   // 5. PDF Generation Route
   test('GET /api/records/dependent/:id/pdf - Downloads immunization PDF', async () => {
     const res = await request(app)

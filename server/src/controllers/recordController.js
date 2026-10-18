@@ -94,17 +94,22 @@ async function createRecord(req, res, next) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
-    // Determine vaccine name if not provided directly
-    let vacName = vaccineName;
-    let vacDefId = vaccineDefinitionId;
-
-    if (vacDefId && !vacName) {
-      const def = await VaccineDefinition.findById(vacDefId);
-      if (def) vacName = def.name;
-    } else if (!vacDefId && vacName) {
-      const def = await VaccineDefinition.findOne({ name: { $regex: `^${vacName}$`, $options: 'i' } });
-      if (def) vacDefId = def._id;
+    // Require vaccineDefinitionId and fetch its definition
+    if (!vaccineDefinitionId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vaccine definition ID is required.'
+      });
     }
+    const def = await VaccineDefinition.findById(vaccineDefinitionId);
+    if (!def) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vaccine definition ID is required.'
+      });
+    }
+    const vacDefId = def._id;
+    const vacName = vaccineName || def.name;
 
     // Handle certificate file upload if present
     let certificateUrl = null;
@@ -124,9 +129,17 @@ async function createRecord(req, res, next) {
       status = 'verified_by_doctor';
     }
 
+    // Ensure a valid vaccineDefinitionId is present
+    if (!vacDefId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vaccine definition ID is required. Please select a vaccine from the list.'
+      });
+    }
+
     const record = await ImmunizationRecord.create({
       dependentId,
-      vaccineDefinitionId: vacDefId || null,
+      vaccineDefinitionId: vacDefId,
       vaccineName: vacName || 'Standard Immunization',
       doseNumber: parseInt(doseNumber || '1', 10),
       administeredAt: new Date(administeredAt),
