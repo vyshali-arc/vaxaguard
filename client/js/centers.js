@@ -59,6 +59,28 @@ document.addEventListener('DOMContentLoaded', () => {
     distanceSelect.addEventListener('change', renderCentersList);
   }
 
+  // Attempt to get user's location
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        console.log('User location:', latitude, longitude);
+        const badge = document.createElement('div');
+        badge.className = 'text-xs text-slate-600 mt-2';
+        badge.textContent = `Your location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        const main = document.querySelector('main');
+        if (main) main.prepend(badge);
+        window.userLocation = { latitude, longitude };
+      },
+      (err) => {
+        Toast.error(`Unable to retrieve your location: ${err.message}. Using default location.`);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  } else {
+    console.warn('Geolocation not supported');
+  }
+
   renderCentersList();
 });
 
@@ -138,7 +160,7 @@ function renderCentersList() {
 
         <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
           <span class="text-slate-600 font-medium">${c.phone}</span>
-          <button onclick="alert('Navigating to: ${c.name}\\nAddress: ${c.address}');"
+          <button onclick="(() => { const dest = encodeURIComponent(c.address); let url = 'https://www.google.com/maps/dir/?api=1&destination=' + dest; if (window.userLocation) { const { latitude, longitude } = window.userLocation; url += '&origin=' + latitude + ',' + longitude; } window.open(url, '_blank'); })()"
             class="px-4 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5">
             <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
             <span>Get Directions</span>

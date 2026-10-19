@@ -4,24 +4,36 @@
  */
 
 // Determine API Base URL dynamically
+const LIVE_BACKEND_URL = 'https://vaxaguard.onrender.com/api';
+
 const API_BASE = (function() {
-  // If explicitly configured in window
+  // 1. If explicitly configured in window
   if (window.__VAXAGUARD_API_URL__) {
-    return window.__VAXAGUARD_API_URL__;
+    return window.__VAXAGUARD_API_URL__.replace(/\/+$/, '');
   }
-  // If saved in localStorage (allows overriding backend URL for separate Vercel/Render hosting)
+  // 2. If saved in localStorage (allows user overriding backend URL)
   const savedUrl = localStorage.getItem('vaxaguard_api_url');
   if (savedUrl && savedUrl.trim()) {
     return savedUrl.trim().replace(/\/+$/, '');
   }
-  // If running on localhost or 127.0.0.1 on a frontend dev server (e.g. port 3000, 5500, 8080)
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    // If not port 5000, point to default backend port 5000
-    if (window.location.port !== '5000' && window.location.port !== '') {
-      return 'http://localhost:5000/api';
-    }
+  // 3. If running on Render live host
+  if (window.location.hostname.includes('onrender.com')) {
+    return '/api';
   }
-  // Otherwise use relative /api route
+  // 4. If running locally on localhost or 127.0.0.1
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    // If frontend is directly served from port 5000 Express server
+    if (window.location.port === '5000') {
+      return '/api';
+    }
+    // If running via Live Server (5500) or Vite (5173, 3000), default to local backend
+    return 'http://localhost:5000/api';
+  }
+  // 5. If opened as a local file (file://) or hosted on a static host (GitHub Pages, etc.)
+  if (window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io')) {
+    return LIVE_BACKEND_URL;
+  }
+  // 6. Default relative /api
   return '/api';
 })();
 
@@ -76,7 +88,7 @@ const API = {
 
   // Central Request Handler
   async request(endpoint, options = {}) {
-    const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
+    let url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
     const token = this.getToken();
 
     const headers = {
@@ -99,11 +111,22 @@ const API = {
     };
 
     try {
-      const response = await fetch(url, config);
+      let response;
+      try {
+        response = await fetch(url, config);
+      } catch (networkErr) {
+        // If local dev server failed or port 5000 was unreachable, auto-fallback to live host
+        if (url.includes('localhost:5000') && !endpoint.startsWith('http')) {
+          console.warn('Local backend unreachable. Retrying with live cloud backend...');
+          url = `${LIVE_BACKEND_URL}${endpoint}`;
+          response = await fetch(url, config);
+        } else {
+          throw new Error('Unable to connect to VaxaGuard backend. Please check network connection or verify server status.');
+        }
+      }
 
       // Handle session expiry
       if (response.status === 401) {
-        // Only redirect if on a protected page
         const isAuthPage = window.location.pathname.includes('login.html') || 
                            window.location.pathname.includes('register.html') || 
                            window.location.pathname.endsWith('/') || 
@@ -115,19 +138,52 @@ const API = {
         }
       }
 
-      // Handle non-JSON responses (like PDF downloads)
-      const contentType = response.headers.get('content-type');
-      if (contentType && (contentType.includes('application/pdf') || contentType.includes('octet-stream'))) {
+      // Handle binary downloads (like PDF)
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/pdf') || contentType.includes('octet-stream')) {
         if (!response.ok) {
           throw new Error(`Download failed with status ${response.status}`);
         }
         return await response.blob();
       }
 
-      const data = await response.json();
+      // Safely parse JSON or handle HTML responses (e.g. 404/502 from proxy or static host)
+      let data;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        // If server returned an HTML error or fallback page
+        if (text.trim().startsWith('<') || text.includes('<!DOCTYPE') || text.includes('<html')) {
+          // If we called relative or localhost and got HTML (e.g. 404 page), try live backend
+          if (!url.includes('onrender.com') && !endpoint.startsWith('http')) {
+            console.warn('Received HTML response instead of JSON. Retrying with live cloud backend...');
+            url = `${LIVE_BACKEND_URL}${endpoint}`;
+            const fbRes = await fetch(url, config);
+            const fbType = fbRes.headers.get('content-type') || '';
+            if (fbType.includes('application/json')) {
+              const fbData = await fbRes.json();
+              if (!fbRes.ok) {
+                const err = new Error(fbData.message || fbData.error || `Request failed with status ${fbRes.status}`);
+                err.status = fbRes.status;
+                err.data = fbData;
+                throw err;
+              }
+              return fbData;
+            }
+          }
+          throw new Error(`Backend API returned HTML instead of JSON (Status ${response.status}). The requested endpoint was not found or the server is starting.`);
+        }
+
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error(text || `Request failed with status ${response.status}`);
+        }
+      }
 
       if (!response.ok) {
-        const error = new Error(data.message || `Request failed with status ${response.status}`);
+        const error = new Error(data.message || data.error || `Request failed with status ${response.status}`);
         error.status = response.status;
         error.data = data;
         throw error;

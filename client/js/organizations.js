@@ -118,8 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await API.get('/organizations/report');
         const d = res.data;
-        alert(
-          `VaxaGuard Institution Aggregate Report\n` +
+        Toast.info(`VaxaGuard Institution Aggregate Report\n` +
           `----------------------------------------\n` +
           `Organization: ${d.organizationName}\n` +
           `Total Registered Children: ${d.totalChildren}\n` +

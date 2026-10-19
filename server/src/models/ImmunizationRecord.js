@@ -10,7 +10,7 @@ const immunizationRecordSchema = new mongoose.Schema(
     vaccineDefinitionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'VaccineDefinition',
-      required: [true, 'Vaccine reference is required']
+      required: [true, 'Vaccine definition reference is required']
     },
     vaccineName: {
       type: String,

@@ -234,3 +234,26 @@ h1, h2, h3, h4, h5, h6 {
     display: none !important;
   }
 }
+
+/* ===== Pastel Purple Theme Overrides ===== */
+:root {
+  --primary-pastel: #c4b5fd; /* pastel purple */
+  --primary-pastel-dark: #a78bfa; /* slightly darker */
+  --primary-pastel-light: #e9d5ff; /* very light */
+}
+/* Override sky colors with pastel purple */
+.bg-sky-600 { background-color: var(--primary-pastel) !important; }
+.hover\:bg-sky-600:hover { background-color: var(--primary-pastel-dark) !important; }
+.text-sky-600 { color: var(--primary-pastel-dark) !important; }
+.hover\:text-sky-600:hover { color: var(--primary-pastel) !important; }
+.border-sky-100 { border-color: var(--primary-pastel-light) !important; }
+.bg-sky-50 { background-color: var(--primary-pastel-light) !important; }
+/* Adjust button hover shadows */
+.shadow-sky-600\/20 { box-shadow: 0 2px 8px rgba(166, 139, 250, 0.2) !important; }
+/* Update badge colors to match theme */
+.badge-completed { background-color: #f3e8ff; color: #7c3aed; border-color: #e9d5ff; }
+.badge-upcoming { background-color: #f0f9ff; color: #0ea5e9; border-color: #bae6fd; }
+.badge-duesoon { background-color: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+.badge-overdue { background-color: #fee2e2; color: #dc2626; border-color: #fecaca; }
+/* Ensure glass panel uses pastel tint */
+.glass-panel { background: rgba(250, 245, 255, 0.85); border: 1px solid rgba(226, 232, 240, 0.8); }

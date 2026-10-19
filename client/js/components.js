@@ -165,11 +165,12 @@ const Components = {
     `;
   },
 
-  // Initialize common UI behaviors
+
   initCommon(activePage = 'dashboard') {
     // 1. Check authentication
     if (!API.isAuthenticated()) {
-      window.location.href = 'login.html';
+      this.clearSession?.();
+      window.location.href = 'login.html?expired=1';
       return;
     }
 
@@ -179,8 +180,17 @@ const Components = {
     const mobileNavContainer = document.getElementById('mobile-nav-container');
 
     if (sidebarContainer) sidebarContainer.innerHTML = this.renderSidebar(activePage);
+    // Attach mobile sidebar toggle handler after rendering
+    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+    if (mobileToggle) {
+      mobileToggle.addEventListener('click', () => {
+        const sidebar = document.querySelector('aside');
+        if (sidebar) sidebar.classList.toggle('hidden');
+      });
+    }
     if (topbarContainer) topbarContainer.innerHTML = this.renderTopbar();
     if (mobileNavContainer) mobileNavContainer.innerHTML = this.renderMobileNav(activePage);
+
 
     // 3. Logout handling
     const logoutBtn = document.getElementById('sidebar-logout-btn');
@@ -235,7 +245,187 @@ const Components = {
     }
   },
 
-  // Modal: Add Family Member
+  // Modal: Add / Edit Family Member (supports both create and update)
+  openAddMemberModal(member = null, onSuccessCallback = null) {
+    let modal = document.getElementById('add-member-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'add-member-modal';
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop';
+      modal.innerHTML = `
+        <div class="bg-white rounded-3xl card-shadow border border-slate-100 max-w-md w-full p-6 sm:p-8 modal-content relative">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <h3 class="text-xl font-bold text-slate-900 font-['Outfit']" id="member-modal-title"></h3>
+            <button class="p-1 rounded-lg text-slate-400 hover:text-slate-600 close-modal-btn">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <form id="add-member-form" class="space-y-4 pt-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-name">
+                Full Name *
+              </label>
+              <input type="text" id="member-name" required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                placeholder="e.g. Aarav Raman">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-dob">
+                  Date of Birth *
+                </label>
+                <input type="date" id="member-dob" required
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-gender">
+                  Gender
+                </label>
+                <select id="member-gender"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-rel">
+                  Relationship *
+                </label>
+                <select id="member-rel"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+                  <option value="Child">Child</option>
+                  <option value="Self">Self</option>
+                  <option value="Spouse">Spouse</option>
+                  <option value="Parent">Parent</option>
+                  <option value="Senior">Senior / Grandparent</option>
+                  <option value="Ward">Ward</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-jur">
+                  Guideline
+                </label>
+                <select id="member-jur"
+                  class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+                  <option value="Indian National Immunization Schedule (UIP)">India (UIP/IAP)</option>
+                  <option value="WHO Immunization Schedule">WHO Global</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1" for="member-notes">
+                Medical Notes (Optional)
+              </label>
+              <textarea id="member-notes" rows="2"
+                class="w-full px-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-slate-500"
+                placeholder="Known allergies, health conditions, or pediatrician contact..."></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button type="button" class="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl close-modal-btn">Cancel</button>
+              <button type="submit" id="save-member-btn" class="px-6 py-2.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-sm transition-all">Save & Generate Schedule</button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    const titleEl = modal.querySelector('#member-modal-title');
+    const saveBtn = modal.querySelector('#save-member-btn');
+    const form = modal.querySelector('#add-member-form');
+    const nameInput = modal.querySelector('#member-name');
+    const dobInput = modal.querySelector('#member-dob');
+    const genderSelect = modal.querySelector('#member-gender');
+    const relSelect = modal.querySelector('#member-rel');
+    const jurSelect = modal.querySelector('#member-jur');
+    const notesInput = modal.querySelector('#member-notes');
+
+    // Reset fields
+    form.reset();
+    nameInput.value = '';
+    dobInput.value = '';
+    genderSelect.value = 'Male';
+    relSelect.value = 'Child';
+    jurSelect.value = 'Indian National Immunization Schedule (UIP)';
+    notesInput.value = '';
+
+    if (member) {
+      titleEl.textContent = 'Edit Family Member';
+      saveBtn.textContent = 'Update & Save Schedule';
+      nameInput.value = member.name || '';
+      dobInput.value = member.dateOfBirth ? new Date(member.dateOfBirth).toISOString().substr(0,10) : '';
+      genderSelect.value = member.gender || 'Male';
+      relSelect.value = member.relationship || 'Child';
+      jurSelect.value = member.jurisdiction || jurSelect.value;
+      notesInput.value = member.notes || '';
+    } else {
+      titleEl.textContent = 'Add Family Member';
+      saveBtn.textContent = 'Save & Generate Schedule';
+    }
+
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons({ root: modal });
+
+    // Close handlers
+    modal.querySelectorAll('.close-modal-btn').forEach(b => {
+      b.onclick = () => modal.classList.add('hidden');
+    });
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: nameInput.value.trim(),
+        dateOfBirth: dobInput.value,
+        gender: genderSelect.value,
+        relationship: relSelect.value,
+        jurisdiction: jurSelect.value,
+        notes: notesInput.value.trim()
+      };
+
+      if (!payload.name || !payload.dateOfBirth) {
+        Toast.warning('Name and Date of Birth are required.');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = member ? 'Updating...' : 'Generating Schedule...';
+      try {
+        let res;
+        if (member && member._id) {
+          res = await API.put(`/dependents/${member._id}`, payload);
+        } else {
+          res = await API.post('/dependents', payload);
+        }
+        Toast.success(`Member ${member ? 'updated' : 'added'} successfully!`);
+        modal.classList.add('hidden');
+        if (typeof onSuccessCallback === 'function') {
+          onSuccessCallback(res.data);
+        } else {
+          // Default: reload current page to reflect changes
+          window.location.reload();
+        }
+      } catch (err) {
+        console.error('Member save error:', err);
+        const msg = err?.data?.message || err.message || 'Failed to save member.';
+        Toast.error(msg);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = member ? 'Update & Save Schedule' : 'Save & Generate Schedule';
+      }
+    };
+
+    // Focus first field
+    nameInput.focus();
+  },
   openAddMemberModal(onSuccessCallback = null) {
     let modal = document.getElementById('add-member-modal');
     if (!modal) {
@@ -516,16 +706,21 @@ const Components = {
 
     // Populate members dropdown
     const select = document.getElementById('rec-person-select');
-    API.get('/dependents').then(res => {
-      if (res.data) {
-        select.innerHTML = '<option value="">Select family member...</option>' +
-          res.data.map(d => `<option value="${d._id}">${d.name} (${d.relationship || 'Member'})</option>`).join('');
-
-        if (prefill.dependentId) {
-          select.value = prefill.dependentId;
+    API.get('/dependents')
+      .then(res => {
+        if (res.data) {
+          select.innerHTML = '<option value="">Select family member...</option>' +
+            res.data.map(d => `<option value="${d._id}">${d.name} (${d.relationship || 'Member'})</option>`).join('');
+          if (prefill.dependentId) {
+            select.value = prefill.dependentId;
+          }
         }
-      }
-    });
+      })
+      .catch(err => {
+        Toast.error(err.message || 'Failed to load family members.');
+        // Disable dependent selection to avoid invalid submissions
+        select.innerHTML = '<option value="">No members available</option>';
+      });
 
     // Prefill fields
     if (prefill.vaccineName) document.getElementById('rec-vac-input').value = prefill.vaccineName;
@@ -563,8 +758,18 @@ const Components = {
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
 
+        // Attempt to map vaccine name to definition ID for backend linking
+        let vaccineDefinitionId = null;
+        try {
+          const vaccinesRes = await API.get('/vaccines');
+          const matchDef = vaccinesRes.data?.find(v => v.name.toLowerCase() === vacName.toLowerCase());
+          if (matchDef) vaccineDefinitionId = matchDef._id;
+        } catch (e) {
+          console.warn('Could not fetch vaccine definitions for lookup');
+        }
         const formData = new FormData();
         formData.append('dependentId', depId);
+        if (vaccineDefinitionId) formData.append('vaccineDefinitionId', vaccineDefinitionId);
         formData.append('vaccineName', vacName);
         formData.append('doseNumber', doseNum);
         formData.append('administeredAt', dateGiven);
